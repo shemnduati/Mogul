@@ -15,7 +15,7 @@ class OrdersController extends Controller
      */
     public function index()
     {
-        return Orders::latest()->paginate(10);
+        return Orders::paginate(10);
     }
 
     /**
@@ -38,15 +38,15 @@ class OrdersController extends Controller
     {
         $this->validate($request, [
             'title' => 'required|string|max:125',
-            'price' => 'required/integer',
-            'qty' => 'required|integer',
+            'price' => 'required',
+            'quantity' => 'required',
             'description' => 'required|string|max:125',
         ]);
 
         $order = new Orders();
         $order->title = $request->title;
         $order->price = $request->price;
-        $order->qty = $request->qty;
+        $order->quantity = $request->quantity;
         $order->Description = $request->description;
         $order->save();
 

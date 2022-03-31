@@ -15,6 +15,33 @@
                             </button>
                         </div>
                     </div>
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>#id</th>
+                                <th>Title</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Description</th>
+                                <th>More</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr v-for="order in orders.data" :key="order.id">
+                                <td>{{order.id}}</td>
+                                 <td>{{order.title}}</td>
+                                 <td>{{order.price}}</td>
+                                 <td>{{order.quantity}}</td>
+                                 <td>{{order.Description}}</td>
+                                 <td>
+                                    <i class="fas fa-trash" style="color: red; cursor: pointer;"></i>
+                                 </td>
+
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -33,21 +60,21 @@
                         <div class="modal-body">
                             <div class="form-group">
                                 <label>Title</label>
-                                <input  type="text" name="title"
+                                <input v-model="form.title"  type="text" name="title"
                                        placeholder="Enter Title"
                                        class="form-control">
                                
                             </div>
                             <div class="form-group">
                                 <label>Price</label>
-                                <input  type="text" name="price"
+                                <input v-model="form.price" type="text" name="price"
                                        placeholder="Enter price"
                                        class="form-control">
                                
                             </div>
                             <div class="form-group">
                                 <label>Quantity</label>
-                                <input  type="text" name="quantity"
+                                <input v-model="form.quantity" type="text" name="quantity"
                                        placeholder="Enter Quantity"
                                        class="form-control">
                                
@@ -55,14 +82,17 @@
                             <div class="row">
                                 <div class="form-group" style="padding: 20px">
                                     <label for="description">Description</label>
-                                    <vue-editor  id="description"></vue-editor>
+                                    <input  v-model="form.description" type="text" name="description"
+                                            placeholder="Enter Description"
+                                            class="form-control">
+                                       
                                    
                                 </div>
                             </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-success" v-if="!this.editMode">
+                            <button type="button" class="btn btn-success" v-if="!this.editMode"  @click="addOrder">
                                 Create
                             </button>
                             <button type="button" class="btn btn-success"  v-if="this.editMode">
@@ -79,20 +109,58 @@
 
 <script>
 import { Form, HasError, AlertError } from 'vform';
-import {VueEditor} from "vue3-editor";
 export default  {
     name: "Orders Management",
     data() {
         
         return {
-           
+           orders:'',
+            editMode: "",
+            form: new Form({
+                id: "",
+                title: "",
+                price: "",
+                quantity: "",
+                description: "",
+            }),
         };
     },
     methods: {
+       updateOrders() {
+            this.form
+                .put("api/orders/" + this.form.id)
+                .then(() => {
+                    $("#addnew").modal("hide");
+                })
+                .catch(() => {});
+        },
+        editOrder(order) {
+            this.editMode = true;
+            $("#addnew").modal("show");
+            this.form.fill(order);
+        },
+        getOrders() {
+            axios
+                .get("/api/orders")
+                .then(({ data }) => [(this.orders = data)]);
+        },
+        addOrder() {
+            this.form
+                .post("api/orders")
+                .then(() => {
+                    $("#addnew").modal("hide");
+                })
+                .catch((error) => {
+                    this.errors = error.response.data.errors;
+                });
+        },
         newModal() {
-                this.editMode = false;
-                $('#addnew').modal('show');
-            },
+            this.editMode = false;
+            $("#addnew").modal("show");
+        },
+    },
+    created() {
+        this.getOrders();
     },
 };
 </script>

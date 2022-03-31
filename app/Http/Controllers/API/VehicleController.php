@@ -5,6 +5,9 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Vehicle;
 use Illuminate\Http\Request;
+use App\Models\Location;
+use App\Models\VehicleStatus;
+
 
 class VehicleController extends Controller
 {
@@ -15,8 +18,30 @@ class VehicleController extends Controller
      */
     public function index()
     {
-        return Vehicle::latest()->paginate(10);
+        $vehicles = Vehicle::get();
+        $parent = array();
+        foreach ($vehicles as $vehicle) {
+            $id  = $vehicle['id'];
+            $type = $vehicle['Vehicle_Type'];
+            $model = $vehicle['Vehicle_Model'];
+            $registration = $vehicle['Vehicle_Reg_No'];
+            $location_id = $vehicle['location_id'];
+            $status = $vehicle['vehicle_status_id'];
+            $locationName = Location::where('id', $location_id)->value('location');
+            $vehicleStatus = VehicleStatus::where('id', $status)->value('status');
+            $child = array(
+                'id' => $id,
+                'type' => $type,
+                'model' => $model,
+                'registration' => $registration,
+                'location' => $locationName,
+                'status' => $vehicleStatus,
+            );
+            array_push($parent, $child);
+        }
+        return ['parent' => $parent];
     }
+    
 
     /**
      * Show the form for creating a new resource.
@@ -63,7 +88,7 @@ class VehicleController extends Controller
      */
     public function show(Vehicle $vehicle)
     {
-        //
+        return Vehicle::paginate(10);
     }
 
     /**

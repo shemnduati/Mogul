@@ -25,3 +25,14 @@ Route::post('vehicleStatus', 'App\Http\Controllers\API\VehicleStatusController@s
 
 Route::get('location', 'App\Http\Controllers\API\LocationController@index');
 Route::post('location', 'App\Http\Controllers\API\LocationController@store');
+
+
+Route::get('deliveryStatus', 'App\Http\Controllers\API\DeliveryStatusController@index');
+Route::post('deliveryStatus', 'App\Http\Controllers\API\DeliveryStatusController@store');
+
+Route::get('orders', 'App\Http\Controllers\API\OrdersController@index');
+Route::post('orders', 'App\Http\Controllers\API\OrdersController@store');
+
+Route::get('vehicle', 'App\Http\Controllers\API\VehicleController@index');
+Route::post('vehicle', 'App\Http\Controllers\API\VehicleController@store');
+

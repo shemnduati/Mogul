@@ -98,13 +98,13 @@ export default {
 
                     })
             },
-            editLocation(cat) {
+            editLocation(loc) {
                 this.editMode = true;
                 $('#addnew').modal('show');
-                this.form.fill(cat);
+                this.form.fill(loc);
             },
             getLocation() {
-                axios.get("/api/Location").then(({data}) => ([this.location = data]));
+                axios.get("/api/location").then(({data}) => ([this.location = data]));
             },
             addLocation() {
                 this.form.post('api/location')

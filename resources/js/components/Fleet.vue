@@ -12,6 +12,39 @@
                             </button>
                         </div>
                     </div>
+                
+                <div class="card-body table-responsive p-0">
+                        <table class="table table-hover">
+                            <thead>
+                            <tr>
+                                <th>#id</th>
+                                <th>Vehicle Reg</th>
+                                <th>Vehicle Type</th>
+                                <th>Vehicle Model</th>
+                                <th>Location</th>
+                                <th>Status</th>
+                                <th>Edit</th>
+                                <th>Delete</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr v-for="veh in vehicles" :key="veh.id">
+                                <td>{{veh.id}}</td>
+                                 <td>{{veh.registration}}</td>
+                                 <td>{{veh.type}}</td>
+                                 <td>{{veh.model}}</td>
+                                 <td>{{veh.location}}</td>
+                                  <td>{{veh.status}}</td>
+                                 <td>
+                                    <i class="fas fa-trash" style="color: red; cursor: pointer;"></i>
+                                 </td>
+                                 <td>
+                                    <i class="fas fa-trash" style="color: red; cursor: pointer;"></i>
+                                 </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -31,43 +64,47 @@
                         <div class="modal-body">
                             <div class="form-group">
                                 <label>Vehicle Type</label>
-                                <input  type="text" name="location"
-                                       placeholder="Enter Town"
+                                <input v-model="form.type" type="text" name="type"
+                                       placeholder="Enter Vehicle Type"
                                        class="form-control">
                                
                             </div>
                             <div class="form-group">
                                 <label>Vehicle Model</label>
-                                <input  type="text" name="location"
-                                       placeholder="Enter Town"
+                                <input v-model="form.model" type="text" name="model"
+                                       placeholder="Enter Vehicle Model"
                                        class="form-control">
                                
                             </div>
                             <div class="form-group">
                                 <label>Vehicle Registration Number</label>
-                                <input  type="text" name="location"
-                                       placeholder="Enter Town"
+                                <input v-model="form.registration " type="text" name="registration"
+                                       placeholder="Enter Vehicle Registration Number"
                                        class="form-control">
                                
                             </div>
                             <div class="form-group">
-                                <label>Vehicle Status</label>
-                                <input  type="text" name="location"
-                                       placeholder="Enter Town"
-                                       class="form-control">
-                               
+                                        <label for="level">Vehicle Station Location</label>
+                                        <select v-model="form.status" class="form-control" name="status" id="status">
+                                            <option selected value="">--Select Stauts--</option>
+                                            <option value="1">Mombasa</option>
+                                            <option value="2">Nairobi</option>
+                                        </select>
                             </div>
                             <div class="form-group">
-                                <label>Vehicle Location station</label>
-                                <input  type="text" name="location"
-                                       placeholder="Enter Town"
-                                       class="form-control">
-                               
+                                        <label for="level">Vehicle Status</label>
+                                        <select v-model="form.location" class="form-control" name="location" id="location">
+                                            <option selected value="">--Select Station--</option>
+                                            <option value="1">Pending</option>
+                                            <option value="2">Loading</option>
+                                            <option value="3">Dispatched</option>
+                                            <option value="4">Delivered</option>
+                                        </select>
                             </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-success" v-if="!this.editMode">
+                            <button type="button" class="btn btn-success" v-if="!this.editMode" @click="addVehicle">
                                 Create
                             </button>
                             <button type="button" class="btn btn-success"  v-if="this.editMode">
@@ -86,14 +123,68 @@ export default {
     name: "Fleet Management",
     data() {
         return {
-            
+            vehicles:'',
+            stauts:'',
+            location:'',
+            editMode: "",
+            form: new Form({
+                id: "",
+                type: "",
+                model: "",
+                registration: "",
+                status: "",
+                location:"",
+            }),
         };
     },
     methods: {
+        updateVehicle() {
+            this.form
+                .put("api/vehicle/" + this.form.id)
+                .then(() => {
+                    $("#addnew").modal("hide");
+                })
+                .catch(() => {});
+        },
+        editVehicle(veh) {
+            this.editMode = true;
+            $("#addnew").modal("show");
+            this.form.fill(veh);
+        },
+        getVehicle() {
+            axios
+                .get("/api/vehicle")
+                .then(({ data }) => [(this.vehicles = data['parent'])]);
+        },
+        getLocation() {
+            axios
+                .get("/api/location")
+                .then(({ data }) => [(this.location = data)]);
+        },
+        getStatus() {
+            axios
+                .get("/api/vehicleStatus")
+                .then(({ data }) => [(this.status = data)]);
+        },
+        addVehicle() {
+            this.form
+                .post("api/vehicle")
+                .then(() => {
+                    $("#addnew").modal("hide");
+                })
+                .catch((error) => {
+                    this.errors = error.response.data.errors;
+                });
+        },
         newModal() {
-                this.editMode = false;
-                $('#addnew').modal('show');
-            },
+            this.editMode = false;
+            $("#addnew").modal("show");
+        },
+    },
+    created() {
+        this.getStatus();
+        this.getLocation();
+        this.getVehicle();
     },
 };
 </script>

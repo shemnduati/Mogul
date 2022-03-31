@@ -15,7 +15,7 @@ class DeliveryStatusController extends Controller
      */
     public function index()
     {
-        return DeliveryStatus::latest()->paginate(10);
+        return DeliveryStatus::paginate(10);
     }
 
     /**
@@ -41,7 +41,7 @@ class DeliveryStatusController extends Controller
             'status' => 'required|string|max:125',
         ]);
 
-        $status = new VehicleStatus();
+        $status = new DeliveryStatus();
         $status->status = $request->status;
         $status->save();
 
